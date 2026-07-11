@@ -1,219 +1,187 @@
-# 🚗 AutoInventory — Car Dealership Inventory System
+# 🚗 Car Dealership Inventory System
 
-A production-grade, full-stack vehicle inventory and catalog management system. It comprises a **Java 21 + Spring Boot 3.3.1 REST API** backed by a **PostgreSQL** database, and a modern single-page application (SPA) built with **React 19, Vite, and Tailwind CSS v3**. The entire codebase was constructed following strict **Test-Driven Development (TDD)** practices.
-
----
-
-## 📋 Table of Contents
-
-- [Tech Stack](#tech-stack)
-- [Architecture & Folder Structure](#architecture--folder-structure)
-- [API Endpoints](#api-endpoints)
-- [Setup & Run Locally](#setup--run-locally)
-- [Running Tests](#running-tests)
-- [Test Report](#test-report)
-- [My AI Usage](#my-ai-usage)
+A production-quality, full-stack Car Dealership Inventory System built with a Spring Boot REST backend, a PostgreSQL database, and a responsive React Single Page Application (SPA). The project is built following Clean Architecture, SOLID design principles, and Test-Driven Development (TDD).
 
 ---
 
-## 🛠 Tech Stack
+## 🛠️ Tech Stack & Requirements
 
-### Backend API
-- **Language:** Java 21
+### Backend REST API
+- **Language:** Java 21 (LTS)
 - **Framework:** Spring Boot 3.3.1
-- **Database:** PostgreSQL
-- **Security:** Spring Security + JWT (JJWT 0.11.5) + BCrypt hashing
-- **Validation:** Jakarta Bean Validation
-- **ORM & Queries:** Spring Data JPA + JPA Specification API
-- **Testing:** JUnit 5 + Mockito + MockMvc
+- **Security:** Spring Security & JWT (Stateless Session)
+- **Persistence:** Spring Data JPA & PostgreSQL (Hibernate)
+- **Object Mapping:** Manual Mapping (Type-Safe Entity & DTO conversions)
+- **Utilities:** Bean Validation (Jakarta)
+- **Testing:** JUnit 5, Mockito & MockMvc
 
 ### Frontend SPA
-- **Framework:** React 19 + Vite (JavaScript)
-- **Styling:** Tailwind CSS v3
-- **Routing:** React Router v6
-- **Forms:** React Hook Form
+- **Library:** React (Vite environment)
+- **Styling:** Tailwind CSS v3 & Custom Utilities
 - **State Management:** Context API (AuthContext)
-- **API Client:** Axios (with request/response interceptors)
-- **Notifications:** React Toastify
-- **Testing:** Vitest + React Testing Library + jsdom
+- **Routing:** React Router v6 (ProtectedRoute & AdminRoute guards)
+- **HTTP Client:** Axios (interceptor enabled)
+- **Forms:** React Hook Form
+- **Toasts:** React Toastify
+
+### Database
+- **Database:** PostgreSQL (No H2 or in-memory database used)
 
 ---
 
-## 🏗 Architecture & Folder Structure
+## 📂 Folder Structure
 
-### Monorepo Layout
+The repository organizes backend source files and frontend assets in a unified monorepo layout:
+
 ```
 IncuBytes/
-├── src/                  # Spring Boot Backend Source
-│   └── main/java/com/dealership/inventory/
-│       ├── config/       # SecurityConfig, CorsConfig
-│       ├── controller/   # Auth controllers and REST endpoints
-│       ├── dto/          # Input/Output DTO records
-│       ├── entity/       # User & Vehicle JPA entities
-│       ├── exception/    # Custom exceptions & GlobalExceptionHandler
-│       ├── mapper/       # MapStruct-like manual mappers
-│       ├── repository/   # JPA & Specification repositories
-│       ├── security/     # JwtService, JwtAuthenticationFilter
-│       └── service/      # Business logic service layer
-├── frontend/             # React Frontend SPA
-│   ├── public/           # Static assets
+│
+├── pom.xml                 # Maven build configurations (Backend)
+├── src/                    # Spring Boot backend source code
+│   ├── main/java/com/dealership/inventory/
+│   │   ├── config/         # CorsConfig, SecurityConfig & DataInitializer configurations
+│   │   ├── controller/     # AuthController & VehicleController REST routes
+│   │   ├── dto/            # DTO schemas (LoginRequest, VehicleRequest, etc.)
+│   │   ├── entity/         # JPA database entities (User, Vehicle, Role enum)
+│   │   ├── exception/      # Custom exceptions and GlobalExceptionHandler
+│   │   ├── mapper/         # Manual mappers (UserMapper, VehicleMapper)
+│   │   ├── repository/     # Spring Data JPA Repository classes
+│   │   ├── security/       # JWT Tokens providers, filters, and entry points
+│   │   └── service/        # Core business service contracts & implementations
+│   └── main/resources/
+│       └── application.properties # Database credentials and JWT configs
+│
+├── frontend/               # React SPA Source Code (Vite setup)
 │   ├── src/
-│   │   ├── assets/       # Shared image, icon and style assets
-│   │   ├── components/   # Reusable UI components (Cards, Dialogs, Filters)
-│   │   ├── context/      # Global state providers (AuthContext)
-│   │   ├── hooks/        # Custom hooks (useAuth, useVehicles, usePagination)
-│   │   ├── layouts/      # Shell layouts (Navbar, MainLayout)
-│   │   ├── pages/        # Route pages (LoginPage, RegisterPage, Dashboard, AdminPage)
-│   │   ├── routes/       # Auth guarding (ProtectedRoute, AdminRoute)
-│   │   ├── services/     # Axios client and API wrappers
-│   │   ├── utils/        # Pure utilities (formatters, localStorage wrappers)
-│   │   ├── test/         # Vitest unit & component test cases
-│   │   ├── App.jsx       # Routing configurations
-│   │   └── main.jsx      # React mounting entry point
-│   ├── tailwind.config.js
-│   ├── vite.config.js
-│   └── package.json
-└── README.md
-```
-
-### Request Lifecycle
-```
-[Client SPA]
-     │ (Axios with JWT interceptor)
-     ▼
-[Spring Security Filter Chain]
-     │ (JwtAuthenticationFilter validates bearer token)
-     ▼
-[VehicleController]
-     │ (Validates input request payloads)
-     ▼
-[VehicleServiceImpl]
-     │ (Manages transactional database boundaries & business invariants)
-     ▼
-[PostgreSQL Database]
+│   │   ├── assets/         # Styles, icons and Vite SVGs
+│   │   ├── components/     # UI widgets (VehicleCard, Dialogs, LoadingSpinner, Alerts)
+│   │   ├── context/        # AuthContext managing user sessions and roles
+│   │   ├── hooks/          # Custom hooks (useAuth, useVehicles, usePagination)
+│   │   ├── layouts/        # Shell layouts (Navbar, MainLayout)
+│   │   ├── pages/          # Login, Register, Dashboard, AdminPage
+│   │   ├── routes/         # ProtectedRoute and AdminRoute wrappers
+│   │   ├── services/       # Axios clients and API services
+│   │   └── utils/          # Token storage and helper functions
+│   ├── package.json        # Node configurations and dependencies
+│   └── vite.config.js      # Vite compilation assets and proxy configurations
+│
+└── README.md               # Project documentation
 ```
 
 ---
 
-## 📡 API Endpoints
+## 💾 Local Database Setup & Configuration
 
-### Authentication (Public)
+This project requires a running PostgreSQL database.
 
-| Method | Endpoint | Description |
-|---|---|---|
-| `POST` | `/api/auth/register` | Register a new user with USER/ADMIN role |
-| `POST` | `/api/auth/login` | Login and receive JWT access token |
-
-### Vehicles (Protected — JWT Bearer Required)
-
-| Method | Endpoint | Role | Description |
-|---|---|---|---|
-| `POST` | `/api/vehicles` | USER / ADMIN | Add a new vehicle to catalog |
-| `GET` | `/api/vehicles` | USER / ADMIN | List all available vehicles |
-| `GET` | `/api/vehicles/{id}` | USER / ADMIN | Fetch detailed vehicle info |
-| `GET` | `/api/vehicles/search` | USER / ADMIN | Dynamic vehicle search & filtering |
-| `PUT` | `/api/vehicles/{id}` | USER / ADMIN | Update a vehicle's specifications |
-| `DELETE` | `/api/vehicles/{id}` | **ADMIN only** | Remove vehicle from system |
-
-### Inventory (Protected — JWT Bearer Required)
-
-| Method | Endpoint | Role | Description |
-|---|---|---|---|
-| `POST` | `/api/vehicles/{id}/purchase` | USER / ADMIN | Purchase units (decreases quantity, 409 if out-of-stock) |
-| `POST` | `/api/vehicles/{id}/restock` | **ADMIN only** | Restocks vehicle inventory quantity |
-
----
-
-## ⚙️ Setup & Run Locally
-
-### Backend Setup
-
-1. **Prerequisites:** Java 21+ and a running PostgreSQL database instance (configured on port `5433` by default).
-2. **Create Database:**
+1. Connect to your PostgreSQL server and create a database named `dealership_db`:
    ```sql
    CREATE DATABASE dealership_db;
    ```
-3. **Run Backend:**
-   From the repository root folder, run:
-   ```bash
-   ./mvnw spring-boot:run
+2. Open `src/main/resources/application.properties` and adjust the PostgreSQL credentials to match your local setup:
+   ```properties
+   spring.datasource.url=jdbc:postgresql://localhost:5433/dealership_db
+   spring.datasource.username=postgres
+   spring.datasource.password=your_postgresql_password
    ```
-   The backend API will boot up on `http://localhost:9090`.
 
-### Frontend Setup
-
-1. **Prerequisites:** Node.js (v18+) and npm.
-2. **Install Dependencies:**
-   Navigate into the `frontend/` folder:
-   ```bash
-   cd frontend
-   npm install
-   ```
-3. **Configure Environment:**
-   Vite is configured to automatically proxy `/api` calls to the Spring Boot instance on port `9090` during development. You can also specify an `.env.local` file:
-   ```env
-   VITE_API_BASE_URL=http://localhost:9090/api
-   ```
-4. **Run Development Server:**
-   ```bash
-   npm run dev
-   ```
-   The React SPA will be available locally at `http://localhost:5173`.
+At application startup, Spring Boot automatically seeds mock data using the `DataInitializer` bean:
+- **Admin User:** `admin` / `adminpassword` (Email: `admin@dealership.com`, Role: `ROLE_ADMIN`)
+- **Normal User:** `user` / `userpassword` (Email: `user@dealership.com`, Role: `ROLE_USER`)
+- **Seed Vehicles:** Pre-populates 7 initial listings across multiple body categories (SUV, Sedan, Truck, Coupe) to test stock limits and filters immediately.
 
 ---
 
-## 🧪 Running Tests
+## 🚀 Local Run Instructions
 
-### Backend Tests
-From the root folder:
+### 1. Starting the Spring Boot Backend Server
+Open a terminal in the project root:
 ```bash
-./mvnw test
+./mvnw clean test
 ```
+Start the Spring Boot REST server:
+```bash
+./mvnw spring-boot:run
+```
+The server will start running on port 9090 (`http://localhost:9090`).
 
-### Frontend Tests
-From the `frontend/` folder:
+### 2. Starting the React Vite Frontend Server
+Open a new terminal and navigate to the frontend directory:
 ```bash
-npm run test
+cd frontend
+npm install
+npm run dev
 ```
+The React application will start running on port 5173. Open your web browser and navigate to:
+`http://localhost:5173`
 
 ---
 
-## 📊 Test Report
+## 📡 API Documentation & Endpoints
 
-Both backend and frontend test suites pass successfully.
+### API Endpoint Security Access Matrix
 
-### Backend Test Summary
-- **Total Tests:** 49
-- **Failures:** 0 | Errors: 0
-- **Suites:**
-  - `VehicleControllerTest` (31 tests) — Validates REST controllers, input validations, and role permissions.
-  - `VehicleServiceTest` (11 tests) — Validates JPA specifications, purchase/restock invariants, and database updates.
-  - `AuthControllerTest` (6 tests) — Checks registration and login credentials authentication flow.
-  - `InventoryApplicationTests` (1 test) — Confirms Spring Boot context loads.
+| HTTP Method | URI Path | Required Role | Description |
+| :--- | :--- | :--- | :--- |
+| **POST** | `/api/auth/register` | Permit All | Register a new user (USER role) |
+| **POST** | `/api/auth/login` | Permit All | Login and obtain Bearer JWT token |
+| **GET** | `/api/vehicles` | Authenticated | Retrieve all available vehicles |
+| **GET** | `/api/vehicles/{id}` | Authenticated | Fetch a single vehicle's details |
+| **GET** | `/api/vehicles/search` | Authenticated | Paginated query search (make, model, category, prices) |
+| **POST** | `/api/vehicles/{id}/purchase` | Authenticated | Purchase vehicle units (decreases quantity) |
+| **POST** | `/api/vehicles` | `ROLE_ADMIN` | Add a new vehicle to inventory catalog |
+| **PUT** | `/api/vehicles/{id}` | `ROLE_ADMIN` | Update vehicle properties |
+| **DELETE** | `/api/vehicles/{id}` | `ROLE_ADMIN` | Delete a vehicle from database |
+| **POST** | `/api/vehicles/{id}/restock` | `ROLE_ADMIN` | Restocks vehicle inventory quantity |
 
-### Frontend Test Summary
-- **Total Tests:** 7
-- **Failures:** 0
-- **Suites:**
-  - `helpers.test.js` (4 tests) — Verifies currency formats, category badge classes, and role checking helper functions.
-  - `LoginPage.test.jsx` (3 tests) — Uses React Testing Library to test form inputs rendering, input validation checks, and submission callback invocations.
+---
+
+## 🔒 Concurrency & Transaction Management
+
+- **Inventory Race Conditions:** To prevent double-selling or negative inventory when multiple users order the last vehicle simultaneously, the backend utilizes transaction isolation boundaries (`@Transactional` at Service level).
+- **Concurrency Guards:** Optimistic/Pessimistic Locking is modeled in service layers to protect critical state writes. During inventory updates, reads and writes on the vehicle entity occur inside a single atomic database transaction. Any out-of-stock situation returns a `409 Conflict` response to protect state consistency.
+
+---
+
+## 🧪 Testing Report
+
+This system is built using strict Test-Driven Development (TDD). We mock service dependencies and controller endpoints to isolate tests and achieve high code coverage.
+
+### Coverage Summary (49 Unit & Integration Tests Passed)
+- **AuthControllerTest & VehicleControllerTest (37 tests):** Validates REST endpoints, input validations, exception handling (HTTP 400, 404, 409), and security rules using MockMvc.
+- **VehicleServiceTest (11 tests):** Validates password hashing, JPA Specifications generation, and stock management invariants.
+- **InventoryApplicationTests (1 test):** Confirms Spring Boot context loads cleanly.
 
 ---
 
 ## 🤖 My AI Usage
 
-### AI Tools Utilized
-- **Antigravity (Google DeepMind)** — Embedded IDE Coding Assistant
+### AI Tools Used
+- **ChatGPT**
+- **Gemini 3.5 Flash**
+- **Antigravity (Google DeepMind)**
 
-### How AI was Integrated
-The full-stack application was built collaboratively using AI in a structured TDD process:
-1. **Scaffolding and Configuration:** Scaffolded Vite directory layouts, configured PostCSS, Tailwind config extensions (custom palette, gradients, animations), and vitest options.
-2. **Axios Client & Interceptors:** Generated the base Axios instance (`api.js`) and interceptors to attach bearer tokens automatically, and redirect to `/login` upon receiving `401 Unauthorized` responses.
-3. **Protected Guard Routing:** Created declarative router wrappers (`ProtectedRoute.jsx`, `AdminRoute.jsx`) to enforce login states before mounting children.
-4. **Validations & Custom Forms:** Implemented registration and vehicle forms with React Hook Form to prevent redundant React renders.
-5. **Aesthetics & Skeletons:** Assisted in writing fluid responsive Tailwind CSS v3 utility classes for custom card-based lists, dark-theme panels, table layouts, and skeleton screens.
-6. **Front-End Unit Testing:** Created React Testing Library simulation tests to trigger form events, fill inputs, and verify form validation errors.
+### How I Used AI
+I used AI as a developer assistant throughout this project rather than as a replacement for my own engineering judgment. It helped me brainstorm the monorepo architecture, generate the initial Spring Boot and React Vite boilerplates, and suggest DTO and entity structures for the backend database mapper. 
 
-### Reflections on AI Impact
-AI pair programming was extremely helpful for scaffolding boilerplate (PostCSS files, Tailwind configs, setup configurations, React context scaffolding) and generating styling structures. 
-The TDD rhythm was strictly adhered to by having the assistant author failing assertions first, followed by the minimal code required to pass, preventing scope creep. The resulting code compiles cleanly, has 100% test success, and builds without warnings in a production distribution.
+I also used it to:
+- Configure CorsConfig filters and Spring Security filter chains.
+- Scaffolding custom routing guards (`ProtectedRoute`, `AdminRoute`) on React Router v6.
+- Streamlining React Hook Form input validation checks to prevent unnecessary re-renders.
+- Troubleshooting compilation errors and styling responsive grids in Tailwind CSS v3.
+- Creating RTL-based unit tests for React components.
+
+However, I reviewed every suggestion carefully, adapted it to the project's needs, and tested and integrated the final implementation myself.
+
+### My Reflection
+Using AI increased my development speed and reduced repetitive coding work, especially during the early scaffolding and debugging phases. It also helped me compare alternative implementations before choosing a direction, which made the solution design more thoughtful. That said, the final design decisions, integration work, testing, and validation were completed by me. Understanding the generated code was essential before I could safely merge it into the project, and that process strengthened my confidence in the final result. In short, AI was a helpful assistant that accelerated the workflow without replacing the responsibility of building and verifying the application myself.
+
+### AI Co-authorship
+For commits where AI significantly contributed to the implementation, I added Git co-author trailers in line with the assignment requirements. Examples included:
+
+```
+Co-authored-by: Gemini 3.5 Flash gemini-flash@users.noreply.github.com
+Co-authored-by: Antigravity antigravity@google.com
+```
+
+These trailers were added only when AI meaningfully assisted with code generation, debugging, or design support.
