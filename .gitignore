@@ -31,3 +31,16 @@ build/
 
 ### VS Code ###
 .vscode/
+
+### Environment & Secrets ###
+# Never commit real credentials - use environment variables instead
+.env
+.env.local
+*.env
+
+### OS Files ###
+.DS_Store
+Thumbs.db
+
+### Logs ###
+*.log
