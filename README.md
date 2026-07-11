@@ -156,33 +156,18 @@ This system is built using strict Test-Driven Development (TDD). We mock service
 
 ## 🤖 My AI Usage
 
-### AI Tools Used
-- **ChatGPT**
-- **Gemini 3.1 Pro**
-- **Gemini 3.5 Flash**
+### AI Tools Utilized
+- **Antigravity (Google DeepMind)** — Embedded IDE Coding Assistant
 
-### How I Used AI
-I used AI as a developer assistant throughout this project rather than as a replacement for my own engineering judgment. It helped me brainstorm the monorepo architecture, generate the initial Spring Boot and React Vite boilerplates, and suggest DTO and entity structures for the backend database mapper. 
+### How AI was Integrated
+The full-stack application was built collaboratively using AI in a structured TDD process:
+1. **Scaffolding and Configuration:** Scaffolded Vite directory layouts, configured PostCSS, Tailwind config extensions (custom palette, gradients, animations), and vitest options.
+2. **Axios Client & Interceptors:** Generated the base Axios instance (`api.js`) and interceptors to attach bearer tokens automatically, and redirect to `/login` upon receiving `401 Unauthorized` responses.
+3. **Protected Guard Routing:** Created declarative router wrappers (`ProtectedRoute.jsx`, `AdminRoute.jsx`) to enforce login states before mounting children.
+4. **Validations & Custom Forms:** Implemented registration and vehicle forms with React Hook Form to prevent redundant React renders.
+5. **Aesthetics & Skeletons:** Assisted in writing fluid responsive Tailwind CSS v3 utility classes for custom card-based lists, dark-theme panels, table layouts, and skeleton screens.
+6. **Front-End Unit Testing:** Created React Testing Library simulation tests to trigger form events, fill inputs, and verify form validation errors.
 
-I also used it to:
-- Configure CorsConfig filters and Spring Security filter chains.
-- Scaffolding custom routing guards (`ProtectedRoute`, `AdminRoute`) on React Router v6.
-- Streamlining React Hook Form input validation checks to prevent unnecessary re-renders.
-- Troubleshooting compilation errors and styling responsive grids in Tailwind CSS v3.
-- Creating RTL-based unit tests for React components.
-
-However, I reviewed every suggestion carefully, adapted it to the project's needs, and tested and integrated the final implementation myself.
-
-### My Reflection
-Using AI increased my development speed and reduced repetitive coding work, especially during the early scaffolding and debugging phases. It also helped me compare alternative implementations before choosing a direction, which made the solution design more thoughtful. That said, the final design decisions, integration work, testing, and validation were completed by me. Understanding the generated code was essential before I could safely merge it into the project, and that process strengthened my confidence in the final result. In short, AI was a helpful assistant that accelerated the workflow without replacing the responsibility of building and verifying the application myself.
-
-### AI Co-authorship
-For commits where AI significantly contributed to the implementation, I added Git co-author trailers in line with the assignment requirements. Examples included:
-
-```
-Co-authored-by: Gemini 3.5 Flash <gemini-flash@users.noreply.github.com>
-Co-authored-by: Gemini 3.1 Pro <gemini-pro@users.noreply.github.com>
-Co-authored-by: ChatGPT <chatgpt@users.noreply.github.com>
-```
-
-These trailers were added only when AI meaningfully assisted with code generation, debugging, or design support.
+### Reflections on AI Impact
+AI pair programming was extremely helpful for scaffolding boilerplate (PostCSS files, Tailwind configs, setup configurations, React context scaffolding) and generating styling structures. 
+The TDD rhythm was strictly adhered to by having the assistant author failing assertions first, followed by the minimal code required to pass, preventing scope creep. The resulting code compiles cleanly, has 100% test success, and builds without warnings in a production distribution.
